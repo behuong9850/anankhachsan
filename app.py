@@ -2373,9 +2373,7 @@ elif menu == "💰 Doanh thu":
 # 23. CHATBOX
 # ============================================================
  
-elif menu == "
-💬
- Chat với khách": 
+elif menu == "💬 Chat với khách": 
  
     st.title("
 💬
