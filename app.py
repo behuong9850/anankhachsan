@@ -2375,9 +2375,7 @@ elif menu == "💰 Doanh thu":
  
 elif menu == "💬 Chat với khách": 
  
-    st.title("
-💬
- Charm Pearl AI") 
+    st.title("💬 Charm Pearl AI") 
     st.caption("Trợ lý ảo của Charm Pearl Hotel · Vũng Tàu") 
  
     # ----------------------------------------------------- 
