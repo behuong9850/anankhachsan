@@ -11,6 +11,12 @@ import time
 # ============================================================
 # CHARM PEARL HOTEL - STREAMLIT + MYSQL AIVEN
 # ============================================================
+# Lưu ý:
+# - Database: Aiven MySQL
+# - Host/Port/User/Database lấy theo thông tin Aiven bạn cung cấp.
+# - Password đang đặt là 123 theo thông tin bạn đã cung cấp trước đó.
+# - Nếu password Aiven thực tế khác 123, chỉ sửa MYSQL_PASSWORD.
+# ============================================================
 
 st.set_page_config(
     page_title="Charm Pearl Hotel",
@@ -28,10 +34,10 @@ LOCATION = "VŨNG TÀU"
 # 1. THÔNG TIN MYSQL AIVEN
 # ============================================================
 
-MYSQL_HOST = "huong-nguyen-jnnxjany005-da5d.i.aivencloud.com"
-MYSQL_PORT = 28463
+MYSQL_HOST = "mysql-2930b663-kanh45750-b31a.ca.aivencloud.com"
+MYSQL_PORT = 27291
 MYSQL_USER = "avnadmin"
-MYSQL_PASSWORD = "AVNS_Y-9KXwC_DRlZtoJdTOY"
+MYSQL_PASSWORD = "123"
 MYSQL_DATABASE = "defaultdb"
 
 # Aiven yêu cầu SSL. Nếu bạn có CA certificate, đặt đường dẫn vào đây.
@@ -81,6 +87,30 @@ ROOM_TYPES = {
         "description": "Villa cao cấp dành cho gia đình hoặc nhóm khách.",
     },
 }
+
+# ============================================================
+# 2B. HÌNH ẢNH KHÁCH SẠN
+# ============================================================
+LOGO = BASE / "IMG_LOGO1.jpg"
+BANNER = BASE / "IMG_BANNER2.jpg"
+BACKGROUND = BASE / "IMG_NENCHIM3.jpg"
+
+ROOM_IMAGES = {
+    "Deluxe Room King": ["IMG_DELUXE_KING.jpg", "IMG_DELUXE_KING1.jpg", "IMG_DELUXE_ROOM_KING.jpg", "DELUXE_KING.jpg"],
+    "Deluxe Room Twins": ["IMG_DELUXE_TWINS.jpg", "IMG_DELUXE_TWINS1.jpg", "IMG_DELUXE_ROOM_TWINS.jpg", "DELUXE_TWINS.jpg"],
+    "Premier Garden": ["IMG_PREMIER_GARDEN.jpg", "IMG_PREMIER_GARDEN1.jpg", "PREMIER_GARDEN.jpg"],
+    "Premier Ocean": ["IMG_PREMIER_OCEAN.jpg", "IMG_PREMIER_OCEAN1.jpg", "PREMIER_OCEAN.jpg"],
+    "Princess Suite": ["IMG_PRINCESS_SUITE.jpg", "IMG_PRINCESS_SUITE1.jpg", "PRINCESS_SUITE.jpg"],
+    "Royal Suite Villa": ["IMG_ROYAL_SUITE_VILLA.jpg", "IMG_ROYAL_SUITE_VILLA1.jpg", "ROYAL_SUITE_VILLA.jpg"],
+}
+
+def find_room_image(room_type):
+    for filename in ROOM_IMAGES.get(room_type, []):
+        path = BASE / filename
+        if path.exists():
+            return path
+    return None
+
 
 STATUSES = ["Trống", "Đã đặt", "Đang ở", "Đang dọn", "Bảo trì"]
 
@@ -1068,8 +1098,64 @@ section[data-testid="stSidebar"] * {
     border-radius: 12px;
     margin: 7px 0;
 }
+
+.room-image-card {
+    background: rgba(255,255,255,0.97);
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid #e2e8eb;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.07);
+    margin-bottom: 20px;
+}
+
+.room-image-placeholder {
+    height: 220px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #eaf1f4, #f7f9fa);
+    color: #78909c;
+    font-size: 46px;
+}
+
+.room-image-info {
+    padding: 16px 18px 18px 18px;
+}
+
+.room-image-title {
+    font-size: 20px;
+    font-weight: 800;
+    color: #123d4d;
+    margin-bottom: 5px;
+}
+
+.asset-note {
+    color: #71828a;
+    font-size: 13px;
+    margin-top: 6px;
+}
 </style>
 """, unsafe_allow_html=True)
+
+
+# ============================================================
+# 12B. HÌNH ẢNH NỀN / LOGO / BANNER
+# ============================================================
+
+bg64 = file_to_base64(BACKGROUND)
+if bg64:
+    st.markdown(
+        f"""<style>
+        .stApp {{
+            background-image: linear-gradient(rgba(247,250,251,0.94), rgba(247,250,251,0.94)),
+                              url('data:image/jpeg;base64,{bg64}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+        }}
+        </style>""",
+        unsafe_allow_html=True,
+    )
 
 
 # ============================================================
@@ -1077,6 +1163,8 @@ section[data-testid="stSidebar"] * {
 # ============================================================
 
 with st.sidebar:
+    if LOGO.exists():
+        st.image(str(LOGO), width=88)
     st.markdown("## 🏨 CHARM PEARL HOTEL")
     st.caption("HOTEL MANAGEMENT SYSTEM")
     st.caption("Vũng Tàu")
@@ -1131,6 +1219,11 @@ SSL: REQUIRED""",
 # ============================================================
 
 if menu == "🏠 Dashboard":
+    if BANNER.exists():
+        left, center, right = st.columns([1, 2.5, 1])
+        with center:
+            st.image(str(BANNER), use_container_width=True)
+
     st.markdown("""
     <div class="hero">
         <div class="hero-title">CHARM PEARL HOTEL</div>
@@ -1484,17 +1577,28 @@ elif menu == "🛏️ Quản lý phòng":
 # ============================================================
 
 elif menu == "📷 Hạng phòng":
-    st.title("📷 Hạng phòng")
+    st.title("📷 Hạng phòng & hình ảnh")
+    st.caption("Mỗi hạng phòng có thể gắn một ảnh riêng. Nếu ảnh chưa được upload, app vẫn chạy bình thường.")
 
-    for room_type, info in ROOM_TYPES.items():
-        with st.expander(room_type, expanded=True):
-            c1, c2, c3 = st.columns(3)
-
-            c1.metric("Giá", money(info["price"]))
-            c2.metric("Sức chứa", f"{info['capacity']} khách")
-            c3.metric("Giường", info["beds"])
-
-            st.write(info["description"])
+    room_types_list = list(ROOM_TYPES.items())
+    for row_start in range(0, len(room_types_list), 2):
+        cols = st.columns(2)
+        for col, item in zip(cols, room_types_list[row_start:row_start + 2]):
+            room_type, info = item
+            with col:
+                path = find_room_image(room_type)
+                st.markdown('<div class="room-image-card">', unsafe_allow_html=True)
+                if path:
+                    st.image(str(path), use_container_width=True)
+                else:
+                    st.markdown('<div class="room-image-placeholder">🏨</div>', unsafe_allow_html=True)
+                st.markdown('<div class="room-image-info">', unsafe_allow_html=True)
+                st.markdown(f"### {safe(room_type)}")
+                st.write(info["description"])
+                st.caption(f"🛏️ {info['beds']} · 👥 {info['capacity']} khách · 💰 {money(info['price'])}/đêm")
+                if not path:
+                    st.caption(f"Ảnh cần upload: {ROOM_IMAGES[room_type][0]}")
+                st.markdown('</div></div>', unsafe_allow_html=True)
 
 
 # ============================================================
@@ -1570,6 +1674,14 @@ elif menu == "📅 Đặt phòng":
             )
 
             room_id = room_options[selected_room]
+
+            room_image = find_room_image(room_type)
+            if room_image:
+                st.image(
+                    str(room_image),
+                    caption=f"{room_type} · Phòng được chọn",
+                    width=520,
+                )
 
             c1, c2 = st.columns(2)
 
@@ -1701,19 +1813,79 @@ elif menu == "🛎️ Check-in / Check-out":
                     key="checkout_select",
                 )
 
-                if st.button(
-                    "🚪 CHECK-OUT",
-                    use_container_width=True,
-                ):
-                    ok, msg = update_booking_status(
-                        options[selected],
-                        "Đã trả phòng",
+                checkout_booking_id = options[selected]
+                checkout_booking = checkout_df[checkout_df["id"] == checkout_booking_id].iloc[0]
+                grand_total = int(checkout_booking["grand_total"] or 0)
+                paid_amount = int(checkout_booking["paid_amount"] or 0)
+                remaining = max(0, grand_total - paid_amount)
+
+                st.metric("Tổng tiền", money(grand_total))
+                st.metric("Đã thanh toán", money(paid_amount))
+                st.metric("Còn phải thanh toán", money(remaining))
+
+                if remaining > 0:
+                    payment_method = st.selectbox(
+                        "Phương thức thanh toán",
+                        PAYMENT_METHODS,
+                        key="checkout_payment_method",
                     )
-                    if ok:
-                        st.success(msg)
-                        st.rerun()
+                    payment_note = st.text_input(
+                        "Ghi chú thanh toán",
+                        key="checkout_payment_note",
+                        placeholder="Ví dụ: Khách thanh toán đủ khi trả phòng",
+                    )
+                    payment_amount = st.number_input(
+                        "Số tiền thanh toán",
+                        min_value=0,
+                        max_value=remaining,
+                        value=remaining,
+                        step=50000,
+                        key="checkout_payment_amount",
+                    )
+                else:
+                    payment_method = PAYMENT_METHODS[0]
+                    payment_note = "Đã thanh toán đủ trước check-out"
+                    payment_amount = 0
+                    st.success("Booking đã thanh toán đủ. Có thể check-out ngay.")
+
+                if st.button(
+                    "💳 THANH TOÁN & CHECK-OUT",
+                    use_container_width=True,
+                    type="primary",
+                    key="checkout_pay_button",
+                ):
+                    if remaining > 0:
+                        if int(payment_amount) != remaining:
+                            st.error(f"Vui lòng thanh toán đủ {money(remaining)} để hoàn tất check-out.")
+                        else:
+                            ok_pay, msg_pay = make_payment(
+                                checkout_booking_id,
+                                int(payment_amount),
+                                payment_method,
+                                payment_note,
+                            )
+                            if ok_pay:
+                                ok_out, msg_out = update_booking_status(
+                                    checkout_booking_id,
+                                    "Đã trả phòng",
+                                )
+                                if ok_out:
+                                    st.success(f"Thanh toán thành công {money(payment_amount)} và check-out thành công.")
+                                    st.rerun()
+                                else:
+                                    st.error(msg_out)
+                            else:
+                                st.error(msg_pay)
                     else:
-                        st.error(msg)
+                        ok_out, msg_out = update_booking_status(
+                            checkout_booking_id,
+                            "Đã trả phòng",
+                        )
+                        if ok_out:
+                            st.success("Check-out thành công.")
+                            st.rerun()
+                        else:
+                            st.error(msg_out)
 
         st.divider()
         st.dataframe(
