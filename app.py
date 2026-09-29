@@ -2694,9 +2694,7 @@ elif menu == "💬 Chat với khách":
  
             return ( 
                 "Anh/chị có thể đặt phòng trực tiếp tại mục " 
-                "**
-📅
-" Đặt phòng** trên hệ thống. " 
+                "**Đặt phòng** trên hệ thống. " 
                 "Tại đó có thể chọn ngày, hạng phòng và " 
                 "phòng cụ thể." 
             ) 
