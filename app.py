@@ -1717,105 +1717,105 @@ elif menu == "📅 Đặt phòng":
 
             note = st.text_area("Ghi chú")
 
-    if st.button(
-    "📅 XÁC NHẬN ĐẶT PHÒNG",
-    use_container_width=True,
-    type="primary",
-):
+            if st.button(
+                "📅 XÁC NHẬN ĐẶT PHÒNG",
+                use_container_width=True,
+                type="primary",
+            ):
+    
+                if not full_name.strip():
+    
+                    st.error("⚠️ Vui lòng nhập tên khách.")
+    
+                elif not phone.strip():
+    
+                    st.error("⚠️ Vui lòng nhập số điện thoại.")
+    
+                else:
+    
+                    ok, msg = create_booking(
+                        full_name,
+                        phone,
+                        email,
+                        id_number,
+                        room_id,
+                        check_in,
+                        check_out,
+                        adults,
+                        children,
+                        note,
+                    )
+    
+                    if ok:
+    
+                        # Hiển thị thông báo thành công
+                        st.success(
+                            "🎉 ĐẶT PHÒNG THÀNH CÔNG!"
+                        )
+    
+                        st.info(
+                            f"📋 {msg}"
+                        )
+    
+                        # Hiển thị thêm thông tin xác nhận
+                        st.markdown(
+                            f"""
+                            <div style="
+                                padding:18px;
+                                border-radius:14px;
+                                background:#eef8f3;
+                                border:1px solid #b8dfc9;
+                                margin-top:10px;
+                            ">
+                                <h4 style="margin-top:0;color:#17633b;">
+                                    ✓ Booking đã được ghi nhận
+                                </h4>
+    
+                                <p>
+                                    <b>Khách hàng:</b> {full_name}
+                                </p>
+    
+                                <p>
+                                    <b>Phòng:</b> {room_id}
+                                </p>
+    
+                                <p>
+                                    <b>Check-in:</b> {check_in}
+                                </p>
+    
+                                <p>
+                                    <b>Check-out:</b> {check_out}
+                                </p>
+    
+                                <p>
+                                    <b>Số người:</b>
+                                    {adults} người lớn · {children} trẻ em
+                                </p>
+    
+                                <p style="margin-bottom:0;">
+                                    <b>Trạng thái:</b>
+                                    <span style="color:#17633b;">
+                                        Đã đặt
+                                    </span>
+                                </p>
+                            </div>
+                            """,
+                            unsafe_allow_html=True,
+                        )
+    
+                        st.balloons()
+    
+                        # KHÔNG st.rerun() ở đây
+                        # để người dùng nhìn thấy thông báo.
+    
+                    else:
+    
+                        st.error(
+                            f"❌ {msg}"
+                        )
 
-    if not full_name.strip():
 
-        st.error("⚠️ Vui lòng nhập tên khách.")
-
-    elif not phone.strip():
-
-        st.error("⚠️ Vui lòng nhập số điện thoại.")
-
-    else:
-
-        ok, msg = create_booking(
-            full_name,
-            phone,
-            email,
-            id_number,
-            room_id,
-            check_in,
-            check_out,
-            adults,
-            children,
-            note,
-        )
-
-        if ok:
-
-            # Hiển thị thông báo thành công
-            st.success(
-                "🎉 ĐẶT PHÒNG THÀNH CÔNG!"
-            )
-
-            st.info(
-                f"📋 {msg}"
-            )
-
-            # Hiển thị thêm thông tin xác nhận
-            st.markdown(
-                f"""
-                <div style="
-                    padding:18px;
-                    border-radius:14px;
-                    background:#eef8f3;
-                    border:1px solid #b8dfc9;
-                    margin-top:10px;
-                ">
-                    <h4 style="margin-top:0;color:#17633b;">
-                        ✓ Booking đã được ghi nhận
-                    </h4>
-
-                    <p>
-                        <b>Khách hàng:</b> {full_name}
-                    </p>
-
-                    <p>
-                        <b>Phòng:</b> {room_id}
-                    </p>
-
-                    <p>
-                        <b>Check-in:</b> {check_in}
-                    </p>
-
-                    <p>
-                        <b>Check-out:</b> {check_out}
-                    </p>
-
-                    <p>
-                        <b>Số người:</b>
-                        {adults} người lớn · {children} trẻ em
-                    </p>
-
-                    <p style="margin-bottom:0;">
-                        <b>Trạng thái:</b>
-                        <span style="color:#17633b;">
-                            Đã đặt
-                        </span>
-                    </p>
-                </div>
-                """,
-                unsafe_allow_html=True,
-            )
-
-            st.balloons()
-
-            # KHÔNG st.rerun() ở đây
-            # để người dùng nhìn thấy thông báo.
-
-        else:
-
-            st.error(
-                f"❌ {msg}"
-            )
-
-
-# ============================================================
+        # ============================================================
 # 18. CHECK-IN / CHECK-OUT
 # ============================================================
 
@@ -2411,7 +2411,7 @@ elif menu == "💬 Chat với khách":
  
         q = question.lower().strip() 
  
-        rooms = st.session_state.rooms.copy() 
+        rooms = fetch_rooms()
  
         # ================================================= 
         # 1. KIỂM TRA KHÁCH HỎI PHÒNG TRỐNG 
