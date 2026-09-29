@@ -34,10 +34,10 @@ LOCATION = "VŨNG TÀU"
 # 1. THÔNG TIN MYSQL AIVEN
 # ============================================================
 
-MYSQL_HOST = "mysql-2930b663-kanh45750-b31a.ca.aivencloud.com"
-MYSQL_PORT = 27291
+MYSQL_HOST = "huong-nguyen-jnnxjany005-da5d.i.aivencloud.com"
+MYSQL_PORT = 28463
 MYSQL_USER = "avnadmin"
-MYSQL_PASSWORD = "123"
+MYSQL_PASSWORD = "AVNS_Y-9KXwC_DRlZtoJdTOY"
 MYSQL_DATABASE = "defaultdb"
 
 # Aiven yêu cầu SSL. Nếu bạn có CA certificate, đặt đường dẫn vào đây.
