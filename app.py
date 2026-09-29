@@ -1815,33 +1815,6 @@ elif menu == "📅 Đặt phòng":
                                     ✓ Booking đã được ghi nhận
                                 </h4>
     
-                                <p>
-                                    <b>Khách hàng:</b> {full_name}
-                                </p>
-    
-                                <p>
-                                    <b>Phòng:</b> {room_id}
-                                </p>
-    
-                                <p>
-                                    <b>Check-in:</b> {check_in}
-                                </p>
-    
-                                <p>
-                                    <b>Check-out:</b> {check_out}
-                                </p>
-    
-                                <p>
-                                    <b>Số người:</b>
-                                    {adults} người lớn · {children} trẻ em
-                                </p>
-    
-                                <p style="margin-bottom:0;">
-                                    <b>Trạng thái:</b>
-                                    <span style="color:#17633b;">
-                                        Đã đặt
-                                    </span>
-                                </p>
                             </div>
                             """,
                             unsafe_allow_html=True,
