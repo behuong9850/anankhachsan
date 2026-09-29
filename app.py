@@ -1717,7 +1717,7 @@ elif menu == "📅 Đặt phòng":
 
             note = st.text_area("Ghi chú")
 
-           if st.button(
+    if st.button(
     "📅 XÁC NHẬN ĐẶT PHÒNG",
     use_container_width=True,
     type="primary",
