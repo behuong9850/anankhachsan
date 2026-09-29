@@ -163,7 +163,6 @@ def file_to_base64(path):
 # 4. KẾT NỐI MYSQL AIVEN
 # ============================================================
 
-@st.cache_resource(ttl=300)
 def get_connection():
     ssl_args = {
         "check_hostname": False,
@@ -189,18 +188,17 @@ def get_connection():
 
 
 def reset_db_connection():
-    try:
-        get_connection.clear()
-    except Exception:
-        pass
+    # Connection không được cache; mỗi thao tác DB dùng một connection riêng.
+    return None
 
 
 def db_query(sql, params=None, fetch=True):
     """
-    Chạy SELECT và trả về list[dict].
-    Tự động thử lại 1 lần nếu connection bị timeout.
+    Chạy SELECT bằng connection mới.
+    Connection luôn được đóng sau khi đọc xong dữ liệu.
     """
     for attempt in range(2):
+        conn = None
         try:
             conn = get_connection()
             conn.ping(reconnect=True)
@@ -211,20 +209,29 @@ def db_query(sql, params=None, fetch=True):
                     return cursor.fetchall()
 
             return []
+
         except Exception as exc:
             if attempt == 0:
-                reset_db_connection()
                 time.sleep(0.3)
             else:
                 st.error(f"Lỗi MySQL: {exc}")
                 return []
 
+        finally:
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
+
 
 def db_execute(sql, params=None):
     """
-    Chạy INSERT/UPDATE/DELETE.
+    Chạy INSERT/UPDATE/DELETE bằng connection mới.
+    Commit xong luôn đóng connection.
     """
     for attempt in range(2):
+        conn = None
         try:
             conn = get_connection()
             conn.ping(reconnect=True)
@@ -237,17 +244,24 @@ def db_execute(sql, params=None):
             return rowcount
 
         except Exception as exc:
-            try:
-                get_connection().rollback()
-            except Exception:
-                pass
+            if conn:
+                try:
+                    conn.rollback()
+                except Exception:
+                    pass
 
             if attempt == 0:
-                reset_db_connection()
                 time.sleep(0.3)
             else:
                 st.error(f"Lỗi MySQL: {exc}")
                 return 0
+
+        finally:
+            if conn:
+                try:
+                    conn.close()
+                except Exception:
+                    pass
 
 
 # ============================================================
@@ -455,6 +469,12 @@ def initialize_database():
             except Exception:
                 pass
         return False, str(exc)
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 # ============================================================
@@ -796,6 +816,12 @@ def create_booking(
             except Exception:
                 pass
         return False, str(exc)
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 def update_booking_status(booking_id, new_status):
@@ -852,6 +878,12 @@ def update_booking_status(booking_id, new_status):
             except Exception:
                 pass
         return False, str(exc)
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 # ============================================================
@@ -916,6 +948,12 @@ def make_payment(booking_id, amount, method, note):
             except Exception:
                 pass
         return False, str(exc)
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 # ============================================================
@@ -993,6 +1031,12 @@ def add_booking_service(booking_id, service_id, quantity):
             except Exception:
                 pass
         return False, str(exc)
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 
 # ============================================================
