@@ -2133,8 +2133,8 @@ elif menu == "💰 Doanh thu":
 # 23. CHATBOX
 # ============================================================
 
-elif menu == "💬 Chat với khách":
-    st.title("💬 Chat với khách")
+elif menu == "💬 Chat box":
+    st.title("💬 Chat box")
 
     chat_rows = db_query("""
         SELECT *
