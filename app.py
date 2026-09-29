@@ -96,12 +96,12 @@ BANNER = BASE / "IMG_BANNER2.jpg"
 BACKGROUND = BASE / "IMG_NENCHIM3.jpg"
 
 ROOM_IMAGES = {
-    "Deluxe Room King": ["IMG_DELUXE_KING.jpg", "IMG_DELUXE_KING1.jpg", "IMG_DELUXE_ROOM_KING.jpg", "DELUXE_KING.jpg"],
-    "Deluxe Room Twins": ["IMG_DELUXE_TWINS.jpg", "IMG_DELUXE_TWINS1.jpg", "IMG_DELUXE_ROOM_TWINS.jpg", "DELUXE_TWINS.jpg"],
-    "Premier Garden": ["IMG_PREMIER_GARDEN.jpg", "IMG_PREMIER_GARDEN1.jpg", "PREMIER_GARDEN.jpg"],
-    "Premier Ocean": ["IMG_PREMIER_OCEAN.jpg", "IMG_PREMIER_OCEAN1.jpg", "PREMIER_OCEAN.jpg"],
-    "Princess Suite": ["IMG_PRINCESS_SUITE.jpg", "IMG_PRINCESS_SUITE1.jpg", "PRINCESS_SUITE.jpg"],
-    "Royal Suite Villa": ["IMG_ROYAL_SUITE_VILLA.jpg", "IMG_ROYAL_SUITE_VILLA1.jpg", "ROYAL_SUITE_VILLA.jpg"],
+    "Deluxe Room King": ["IMG_DELUXEKING.jpg", "IMG_DELUXEKING1.jpg", "IMG_DELUXEROOMKING.jpg", "DELUXEKING.jpg"],
+    "Deluxe Room Twins": ["IMG_DELUXETWINS.jpg", "IMG_DELUXETWINS1.jpg", "IMG_DELUXEROOMTWINS.jpg", "DELUXETWINS.jpg"],
+    "Premier Garden": ["IMG_PREMIERGARDEN.jpg", "IMG_PREMIERGARDEN1.jpg", "PREMIERGARDEN.jpg"],
+    "Premier Ocean": ["IMG_PREMIEROCEAN.jpg", "IMG_PREMIEROCEAN1.jpg", "PREMIEROCEAN.jpg"],
+    "Princess Suite": ["IMG_PRINCESSSUITE.jpg", "IMG_PRINCESSSUITE1.jpg", "PRINCESSSUITE.jpg"],
+    "Royal Suite Villa": ["IMG_ROYALSUITEVILLA.jpg", "IMG_ROYALSUITEVILLA1.jpg", "ROYALSUITEVILLA.jpg"],
 }
 
 def find_room_image(room_type):
@@ -1717,34 +1717,102 @@ elif menu == "📅 Đặt phòng":
 
             note = st.text_area("Ghi chú")
 
-            if st.button(
-                "📅 XÁC NHẬN ĐẶT PHÒNG",
-                use_container_width=True,
-                type="primary",
-            ):
-                if not full_name.strip():
-                    st.error("Vui lòng nhập tên khách.")
-                elif not phone.strip():
-                    st.error("Vui lòng nhập số điện thoại.")
-                else:
-                    ok, msg = create_booking(
-                        full_name,
-                        phone,
-                        email,
-                        id_number,
-                        room_id,
-                        check_in,
-                        check_out,
-                        adults,
-                        children,
-                        note,
-                    )
+           if st.button(
+    "📅 XÁC NHẬN ĐẶT PHÒNG",
+    use_container_width=True,
+    type="primary",
+):
 
-                    if ok:
-                        st.success(msg)
-                        st.rerun()
-                    else:
-                        st.error(msg)
+    if not full_name.strip():
+
+        st.error("⚠️ Vui lòng nhập tên khách.")
+
+    elif not phone.strip():
+
+        st.error("⚠️ Vui lòng nhập số điện thoại.")
+
+    else:
+
+        ok, msg = create_booking(
+            full_name,
+            phone,
+            email,
+            id_number,
+            room_id,
+            check_in,
+            check_out,
+            adults,
+            children,
+            note,
+        )
+
+        if ok:
+
+            # Hiển thị thông báo thành công
+            st.success(
+                "🎉 ĐẶT PHÒNG THÀNH CÔNG!"
+            )
+
+            st.info(
+                f"📋 {msg}"
+            )
+
+            # Hiển thị thêm thông tin xác nhận
+            st.markdown(
+                f"""
+                <div style="
+                    padding:18px;
+                    border-radius:14px;
+                    background:#eef8f3;
+                    border:1px solid #b8dfc9;
+                    margin-top:10px;
+                ">
+                    <h4 style="margin-top:0;color:#17633b;">
+                        ✓ Booking đã được ghi nhận
+                    </h4>
+
+                    <p>
+                        <b>Khách hàng:</b> {full_name}
+                    </p>
+
+                    <p>
+                        <b>Phòng:</b> {room_id}
+                    </p>
+
+                    <p>
+                        <b>Check-in:</b> {check_in}
+                    </p>
+
+                    <p>
+                        <b>Check-out:</b> {check_out}
+                    </p>
+
+                    <p>
+                        <b>Số người:</b>
+                        {adults} người lớn · {children} trẻ em
+                    </p>
+
+                    <p style="margin-bottom:0;">
+                        <b>Trạng thái:</b>
+                        <span style="color:#17633b;">
+                            Đã đặt
+                        </span>
+                    </p>
+                </div>
+                """,
+                unsafe_allow_html=True,
+            )
+
+            st.balloons()
+
+            # KHÔNG st.rerun() ở đây
+            # để người dùng nhìn thấy thông báo.
+
+        else:
+
+            st.error(
+                f"❌ {msg}"
+            )
 
 
 # ============================================================
@@ -2304,114 +2372,403 @@ elif menu == "💰 Doanh thu":
 # ============================================================
 # 23. CHATBOX
 # ============================================================
-
-elif menu == "💬 Chat với khách":
-    st.title("💬 Chat với khách")
-
-    chat_rows = db_query("""
-        SELECT *
-        FROM chat_messages
-        ORDER BY id ASC
-        LIMIT 100
-    """)
-
-    if chat_rows:
-        for msg in chat_rows:
-            if msg["sender"] == "customer":
-                st.markdown(
-                    f"""
-                    <div class="chat-user">
-                        <b>👤 {safe(msg["customer_name"])}</b><br>
-                        {safe(msg["message"])}
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-            else:
-                st.markdown(
-                    f"""
-                    <div class="chat-hotel">
-                        <b>🏨 Hotel</b><br>
-                        {safe(msg["message"])}
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
-    else:
-        st.info("Chưa có tin nhắn.")
-
-    st.divider()
-
-    with st.form("chat_form"):
-        customer_name = st.text_input(
-            "Tên khách",
-            value="Khách",
-        )
-
-        message = st.text_area(
-            "Tin nhắn",
-            placeholder="Nhập câu hỏi của khách...",
-        )
-
-        send = st.form_submit_button(
-            "💬 GỬI",
-            use_container_width=True,
-        )
-
-        if send and message.strip():
-            db_execute("""
-                INSERT INTO chat_messages
-                (sender, customer_name, message)
-                VALUES ('customer', %s, %s)
-            """, (
-                customer_name.strip(),
-                message.strip(),
-            ))
-
-            # Trợ lý tự động cơ bản, không cần API bên ngoài.
-            text = message.lower()
-
-            if "giá" in text or "phòng" in text:
-                answer = (
-                    "Xin chào! Giá phòng hiện tại: "
-                    "Deluxe từ 850.000 VNĐ/đêm, "
-                    "Premier Garden 1.100.000 VNĐ/đêm, "
-                    "Premier Ocean 1.350.000 VNĐ/đêm, "
-                    "Princess Suite 1.800.000 VNĐ/đêm, "
-                    "Royal Suite Villa 3.000.000 VNĐ/đêm."
-                )
-            elif "check-in" in text or "nhận phòng" in text:
-                answer = (
-                    "Thời gian check-in mặc định có thể được "
-                    "nhân viên khách sạn xác nhận theo booking."
-                )
-            elif "check-out" in text or "trả phòng" in text:
-                answer = (
-                    "Bạn vui lòng cung cấp mã booking để nhân viên "
-                    "kiểm tra thông tin check-out."
-                )
-            elif "wifi" in text:
-                answer = (
-                    "Vui lòng liên hệ lễ tân để nhận thông tin Wi-Fi "
-                    "và mật khẩu mới nhất của khách sạn."
-                )
-            else:
-                answer = (
-                    "Cảm ơn bạn đã liên hệ CHARM PEARL HOTEL. "
-                    "Nhân viên sẽ hỗ trợ bạn ngay."
-                )
-
-            db_execute("""
-                INSERT INTO chat_messages
-                (sender, customer_name, message)
-                VALUES ('hotel', %s, %s)
-            """, (
-                "Charm Pearl Hotel",
-                answer,
-            ))
-
-            st.rerun()
-
+ 
+elif menu == "
+💬
+ Chat với khách": 
+ 
+    st.title("
+💬
+ Charm Pearl AI") 
+    st.caption("Trợ lý ảo của Charm Pearl Hotel · Vũng Tàu") 
+ 
+    # ----------------------------------------------------- 
+    # Khởi tạo lịch sử chat 
+    # ----------------------------------------------------- 
+ 
+    if "chat_history" not in st.session_state: 
+        st.session_state.chat_history = [ 
+            { 
+                "role": "assistant", 
+                "content": 
+                    "Xin chào! Tôi là trợ lý ảo của Charm Pearl Hotel. " 
+                    "Tôi có thể giúp anh/chị kiểm tra phòng trống, " 
+                    "giá phòng, hạng phòng và thông tin khách sạn." 
+            } 
+        ] 
+ 
+    # ----------------------------------------------------- 
+    # HIỂN THỊ LỊCH SỬ CHAT 
+    # ----------------------------------------------------- 
+ 
+    for message in st.session_state.chat_history: 
+ 
+        with st.chat_message(message["role"]): 
+ 
+            st.markdown(message["content"]) 
+ 
+    # ----------------------------------------------------- 
+    # HÀM TRẢ LỜI CHATBOT 
+    # ----------------------------------------------------- 
+ 
+    def chatbot_reply(question): 
+ 
+        q = question.lower().strip() 
+ 
+        rooms = st.session_state.rooms.copy() 
+ 
+        # ================================================= 
+        # 1. KIỂM TRA KHÁCH HỎI PHÒNG TRỐNG 
+        # ================================================= 
+ 
+        asking_available = any( 
+            keyword in q 
+            for keyword in [ 
+                "còn phòng", 
+                "phòng trống", 
+                "còn phòng trống", 
+                "phòng nào còn", 
+                "phòng còn", 
+                "còn phòng nào", 
+                "phòng có sẵn", 
+                "available room", 
+                "available" 
+            ] 
+        ) 
+ 
+        # ================================================= 
+        # 2. XÁC ĐỊNH HẠNG PHÒNG KHÁCH ĐANG HỎI 
+        # ================================================= 
+ 
+        room_type = None 
+ 
+        room_keywords = { 
+            "deluxe room king": "Deluxe Room King", 
+            "deluxe king": "Deluxe Room King", 
+            "deluxe room twins": "Deluxe Room Twins", 
+            "deluxe twins": "Deluxe Room Twins", 
+            "twin": "Deluxe Room Twins", 
+            "premier garden": "Premier Garden", 
+            "premier ocean": "Premier Ocean", 
+            "premier": "Premier Ocean", 
+            "princess suite": "Princess Suite", 
+            "princess": "Princess Suite", 
+            "royal suite villa": "Royal Suite Villa", 
+            "royal suite": "Royal Suite Villa", 
+            "villa": "Royal Suite Villa" 
+        } 
+ 
+        for keyword, name in room_keywords.items(): 
+ 
+            if keyword in q: 
+                room_type = name 
+                break 
+ 
+        # ================================================= 
+        # 3. KHÁCH HỎI PHÒNG TRỐNG 
+        # ================================================= 
+ 
+        if asking_available: 
+ 
+            available = rooms[ 
+                rooms["status"].astype(str).str.lower() == "trống" 
+            ].copy() 
+ 
+            # --------------------------------------------- 
+            # Nếu hỏi một hạng phòng cụ thể 
+            # --------------------------------------------- 
+ 
+            if room_type: 
+ 
+                available = available[ 
+                    available["room_type"] == room_type 
+                ] 
+ 
+                if available.empty: 
+ 
+                    return ( 
+                        f"Hiện tại Charm Pearl Hotel " 
+                        f"không còn phòng trống thuộc hạng " 
+                        f"**{room_type}**." 
+                    ) 
+ 
+                room_list = ", ".join( 
+                    available["room_number"] 
+                    .astype(str) 
+                    .tolist() 
+                ) 
+ 
+                price = available.iloc[0]["price"] 
+ 
+                return ( 
+                    f"Hiện tại **{room_type}** vẫn còn " 
+                    f"**{len(available)} phòng trống**.\n\n" 
+                    f"Phòng: **{room_list}**\n\n" 
+                    f"Giá phòng: **{money(price)} / đêm**." 
+                ) 
+ 
+            # --------------------------------------------- 
+            # Nếu hỏi tất cả phòng 
+            # --------------------------------------------- 
+ 
+            if available.empty: 
+ 
+                return ( 
+                    "Hiện tại khách sạn không còn phòng " 
+                    "đang ở trạng thái **Trống**." 
+                ) 
+ 
+            result = [] 
+ 
+            for rt in ROOM_TYPES.keys(): 
+ 
+                data = available[ 
+                    available["room_type"] == rt 
+                ] 
+ 
+                if not data.empty: 
+ 
+                    room_list = ", ".join( 
+                        data["room_number"] 
+                        .astype(str) 
+                        .tolist() 
+                    ) 
+ 
+                    price = data.iloc[0]["price"] 
+ 
+                    result.append( 
+                        f"**{rt}** — {len(data)} phòng " 
+                        f"({room_list}) · " 
+                        f"{money(price)}/đêm" 
+                    ) 
+ 
+            return ( 
+                f"Hiện tại Charm Pearl Hotel còn " 
+                f"**{len(available)} phòng trống**:\n\n" 
+                + "\n\n".join(result) 
+            ) 
+ 
+        # ================================================= 
+        # 4. KHÁCH HỎI GIÁ PHÒNG 
+        # ================================================= 
+ 
+        asking_price = any( 
+            keyword in q 
+            for keyword in [ 
+                "giá phòng", 
+                "bao nhiêu tiền", 
+                "bao nhiêu", 
+                "giá bao nhiêu", 
+                "giá", 
+                "price" 
+            ] 
+        ) 
+ 
+        if asking_price: 
+ 
+            if room_type: 
+ 
+                info = ROOM_TYPES.get(room_type) 
+ 
+                if info: 
+ 
+                    return ( 
+                        f"**{room_type}**\n\n" 
+                        f"Giá: **{money(info['price'])}/đêm**\n\n" 
+                        f"Sức chứa tối đa: **{info['capacity']} khách**." 
+                    ) 
+ 
+            # Nếu hỏi giá nhưng không nói rõ hạng 
+            result = [] 
+ 
+            for rt, info in ROOM_TYPES.items(): 
+ 
+                result.append( 
+                    f"**{rt}**: " 
+                    f"{money(info['price'])}/đêm · " 
+                    f"Tối đa {info['capacity']} khách" 
+                ) 
+ 
+            return ( 
+                "Hiện Charm Pearl Hotel có các hạng phòng:\n\n" 
+                + "\n\n".join(result) 
+            ) 
+ 
+        # ================================================= 
+        # 5. KHÁCH HỎI HẠNG PHÒNG 
+        # ================================================= 
+ 
+        if any( 
+            keyword in q 
+            for keyword in [ 
+                "hạng phòng", 
+                "loại phòng", 
+                "có những phòng", 
+                "các phòng", 
+                "phòng nào", 
+                "phòng gì" 
+            ] 
+        ): 
+ 
+            result = [] 
+ 
+            for rt, info in ROOM_TYPES.items(): 
+ 
+                result.append( 
+                    f"**{rt}** — " 
+                    f"{money(info['price'])}/đêm · " 
+                    f"Tối đa {info['capacity']} khách" 
+                ) 
+ 
+            return ( 
+                "Charm Pearl Hotel hiện có 6 hạng phòng:\n\n" 
+                + "\n\n".join(result) 
+            ) 
+ 
+        # ================================================= 
+        # 6. CHECK-IN / CHECK-OUT 
+        # ================================================= 
+ 
+        if "check-in" in q or "check in" in q: 
+ 
+            return ( 
+                "Giờ check-in tiêu chuẩn của khách sạn là " 
+                "**14:00**." 
+            ) 
+ 
+        if "check-out" in q or "check out" in q: 
+ 
+            return ( 
+                "Giờ check-out tiêu chuẩn của khách sạn là " 
+                "**12:00**." 
+            ) 
+ 
+        # ================================================= 
+        # 7. ĐỊA CHỈ 
+        # ================================================= 
+ 
+        if any( 
+            keyword in q 
+            for keyword in [ 
+                "địa chỉ", 
+                "ở đâu", 
+                "địa điểm", 
+                "vị trí" 
+            ] 
+        ): 
+ 
+            return ( 
+                "Charm Pearl Hotel tọa lạc tại " 
+                "**Vũng Tàu**." 
+            ) 
+ 
+        # ================================================= 
+        # 8. DỊCH VỤ 
+        # ================================================= 
+ 
+        if any( 
+            keyword in q 
+            for keyword in [ 
+                "dịch vụ", 
+                "có gì", 
+                "tiện nghi", 
+                "tiện ích" 
+            ] 
+        ): 
+ 
+            return ( 
+                "Charm Pearl Hotel cung cấp nhiều dịch vụ " 
+                "như ăn sáng, cà phê, giặt ủi, minibar, " 
+                "Extra Bed, spa và đưa đón sân bay." 
+            ) 
+ 
+        # ================================================= 
+        # 9. ĐẶT PHÒNG 
+        # ================================================= 
+ 
+        if any( 
+            keyword in q 
+            for keyword in [ 
+                "đặt phòng", 
+                "book phòng", 
+                "booking", 
+                "muốn đặt" 
+            ] 
+        ): 
+ 
+            return ( 
+                "Anh/chị có thể đặt phòng trực tiếp tại mục " 
+                "**
+📅
+ Đặt phòng** trên hệ thống. " 
+                "Tại đó có thể chọn ngày, hạng phòng và " 
+                "phòng cụ thể." 
+            ) 
+ 
+        # ================================================= 
+        # 10. CHÀO HỎI 
+        # ================================================= 
+ 
+        if any( 
+            keyword in q 
+            for keyword in [ 
+                "xin chào", 
+                "hello", 
+                "hi", 
+                "chào" 
+            ] 
+        ): 
+ 
+            return ( 
+                "Xin chào! Tôi là **Charm Pearl AI**. " 
+                "Anh/chị muốn kiểm tra phòng trống, " 
+                "giá phòng hay thông tin khách sạn?" 
+            ) 
+ 
+        # ================================================= 
+        # 11. KHÔNG HIỂU 
+        # ================================================= 
+ 
+        return ( 
+            "Tôi có thể hỗ trợ anh/chị về:\n\n" 
+            "- Phòng còn trống\n" 
+            "- Giá phòng\n" 
+            "- Các hạng phòng\n" 
+            "- Sức chứa\n" 
+            "- Giờ check-in / check-out\n" 
+            "- Dịch vụ khách sạn\n" 
+            "- Đặt phòng\n\n" 
+            "Anh/chị có thể hỏi ví dụ: " 
+            "**“Còn phòng Premier Ocean không?”**" 
+        ) 
+ 
+    # ===================================================== 
+    # Ô NHẬP CHAT 
+    # ===================================================== 
+ 
+    question = st.chat_input( 
+        "Nhập câu hỏi cho Charm Pearl AI..." 
+    ) 
+ 
+    if question: 
+ 
+        # Hiện câu hỏi khách 
+        st.session_state.chat_history.append({ 
+            "role": "user", 
+            "content": question 
+        }) 
+ 
+        # Tạo câu trả lời 
+        answer = chatbot_reply(question) 
+ 
+        # Lưu câu trả lời 
+        st.session_state.chat_history.append({ 
+            "role": "assistant", 
+            "content": answer 
+        }) 
+ 
+        # Reload để hiển thị tin nhắn mới 
+        st.rerun() 
 
 # ============================================================
 # 24. BÁO CÁO
@@ -2521,7 +2878,6 @@ elif menu == "📊 Báo cáo":
             use_container_width=True,
             hide_index=True,
         )
-
 
 # ============================================================
 # FOOTER
